@@ -3,6 +3,7 @@
         xsi:noNamespaceSchemaLocation="../../../engine/Shopware/Components/Plugin/schema/plugin.xsd">
 
     <label>Dynamische Kategorien</label>
+    <label lang="en">Dynamic Categories</label>
     <version>1.0.0</version>
     <copyright><![CDATA[Einrichtungshaus Ostermann GmbH & Co. KG]]></copyright>
     <link>https://www.ostermann.de</link>

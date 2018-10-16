@@ -11,7 +11,7 @@
          verbose="true">
 
     <testsuites>
-        <testsuite name="ArticleAssemblySurcharge">
+        <testsuite name="OstDynamicCategories">
             <directory>./Unit</directory>
         </testsuite>
     </testsuites>

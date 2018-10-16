@@ -81,11 +81,5 @@ class Uninstall
      */
     public function uninstall()
     {
-        // ...
-        $this->crudService->delete('s_order_details_attributes', 'ost_article_assembly_surcharge_status');
-        $this->crudService->delete('s_order_details_attributes', 'ost_article_assembly_surcharge_costs');
-
-        // generate new attribute tables
-        $this->modelManager->generateAttributeModels(['s_order_details_attributes']);
     }
 }
