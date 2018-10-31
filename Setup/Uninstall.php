@@ -81,5 +81,18 @@ class Uninstall
      */
     public function uninstall()
     {
+        if ($this->context->keepUserData()) {
+            return true;
+        }
+        try {
+            $this->crudService->delete(
+                's_categories_attributes',
+                'category_writer_stream_ids'
+            );
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 }

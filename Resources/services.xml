@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns="http://symfony.com/schema/dic/services"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services
+        http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="ost_dynamic_categories.commands.write_category_to_articles_command"
+                 class="OstDynamicCategories\Commands\WriteCategoryToArticlesCommand">
+            <tag name="console.command"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="shopware_product_stream.repository"/>
+            <argument type="service" id="shopware_storefront.context_service"/>
+            <argument type="service" id="shopware_searchdbal.dbal_query_builder_factory"/>
+            <argument type="service" id="shopware_storefront.category_service"/>
+        </service>
+
+        <service id="ost_dynamic_categories.bundle.search_bundle_dbal.search_title_live_condition_handler"
+                 class="OstDynamicCategories\Bundle\SearchBundleDBAL\ConditionHandler\SearchTitleLiveConditionHandler">
+            <tag name="condition_handler_dbal"/>
+        </service>
+
+        <service id="ost_dynamic_categories.bundle.search_bundle_dbal.search_description_live_condition_handler"
+                 class="OstDynamicCategories\Bundle\SearchBundleDBAL\ConditionHandler\SearchDescriptionLiveConditionHandler">
+            <tag name="condition_handler_dbal"/>
+        </service>
+
+        <service
+                id="ost_dynamic_categories_bundle.search_bundle_dbal_condition_handler.no_category_live_condition_handler"
+                class="OstDynamicCategories\Bundle\SearchBundleDBAL\ConditionHandler\NoCategoryLiveConditionHandler">
+            <tag name="condition_handler_dbal"/>
+        </service>
+
+        <service id="ost_dynamic_categories.bundle.search_bundle_es.search_title_live_condition_handler"
+                 class="OstDynamicCategories\Bundle\SearchBundleES\ConditionHandler\SearchTitleLiveConditionHandler">
+            <tag name="shopware_search_es.search_handler"/>
+        </service>
+
+        <service id="ost_dynamic_categories.bundle.search_bundle_es.search_description_live_condition_handler"
+                 class="OstDynamicCategories\Bundle\SearchBundleES\ConditionHandler\SearchDescriptionLiveConditionHandler">
+            <tag name="shopware_search_es.search_handler"/>
+        </service>
+
+        <service
+                id="ost_dynamic_categories_bundle.search_bundle_es_condition_handler.no_category_live_condition_handler"
+                class="OstDynamicCategories\Bundle\SearchBundleES\ConditionHandler\NoCategoryLiveConditionHandler">
+            <tag name="shopware_search_es.search_handler"/>
+        </service>
+
+        <service id="ost_dynamic_categories.subscriber.backend_subscriber"
+                 class="OstDynamicCategories\Subscribers\BackendSubscriber">
+            <tag name="shopware.event_subscriber"/>
+            <argument type="service" id="snippets"/>
+            <argument type="service" id="models"/>
+        </service>
+    </services>
+</container>

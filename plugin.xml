@@ -10,4 +10,17 @@
     <author><![CDATA[Einrichtungshaus Ostermann GmbH & Co. KG]]></author>
     <compatibility minVersion="5.5.0" />
 
+    <description lang="de">
+        Das Plugin fügt einen Konsolen Befehl hinzu, womit die Kategorien, welche einen ProductStream haben die Artikel
+        von diesem zugeordnet bekommen.
+
+        Desweiteren werden zwei neue Filter hinzugefügt, "Artikel Name Filter" und der "Artikel Beschreibung Filter".
+        Diese Filter nehmen die Suchbegriffe Semikolon getrennt für eine oder-Verbindung und mit leerzeichen getrennt
+        für eine und-Verbindung.
+
+        Beispiel: "Lavalampe;Lampe e17" Es würden alle Artikel mit "Lavalampe" oder mit "Lampe" und "e17" gefunden
+        werden.
+
+        Die Ausführung erfolgt über den "pscw:write" befehl, welcher auch eine Subshop ID annehemen kann.
+    </description>
 </plugin>

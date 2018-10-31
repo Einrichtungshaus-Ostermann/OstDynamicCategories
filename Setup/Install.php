@@ -16,6 +16,7 @@ use Shopware\Bundle\AttributeBundle\Service\CrudService;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\InstallContext;
+use Shopware\Models\ProductStream\ProductStream;
 
 class Install
 {
@@ -81,5 +82,21 @@ class Install
      */
     public function install()
     {
+        try {
+            $this->crudService->update(
+                's_categories_attributes',
+                'category_writer_stream_ids',
+                'multi_selection',
+                [
+                    'entity'           => ProductStream::class,
+                    'displayInBackend' => true,
+                    'label'            => 'Productstreams for Categorywriter',
+                ],
+                null,
+                true
+            );
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
