@@ -32,14 +32,11 @@ class NoCategoryLiveConditionHandler extends SearchLiveConditionHandler
         return $condition instanceof NoCategoryLiveCondition;
     }
 
-
-
     public function generateCondition(
         ConditionInterface $condition,
         QueryBuilder $query,
         ShopContextInterface $context
-    )
-    {
+    ) {
         $query->andWhere('product.id NOT IN (SELECT DISTINCT articleID FROM s_articles_categories)');
     }
 }

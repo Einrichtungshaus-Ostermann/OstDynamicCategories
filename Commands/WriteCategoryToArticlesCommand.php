@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 /**
  * Einrichtungshaus Ostermann GmbH & Co. KG - Dynamic Categories
  *
@@ -43,56 +44,40 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
      */
     private $modelManager;
 
-
-
     /**
      * @var RepositoryInterface
      */
     private $repository;
-
-
 
     /**
      * @var ContextServiceInterface
      */
     private $contextService;
 
-
-
     /**
      * @var QueryBuilderFactoryInterface
      */
     private $queryBuilderFactory;
-
-
 
     /**
      * @var ConfigReader
      */
     private $configReader;
 
-
-
     /**
      * @var ConfigWriter
      */
     private $configWriter;
-
-
 
     /**
      * @var CategoryServiceInterface
      */
     private $categoryService;
 
-
-
     /**
      * @var ShopContext
      */
     private $shopContext;
-
-
 
     public function __construct(
         ModelManager $modelManager,
@@ -100,8 +85,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         ContextServiceInterface $contextService,
         QueryBuilderFactoryInterface $queryBuilderFactory,
         CategoryServiceInterface $categoryService
-    )
-    {
+    ) {
         parent::__construct('pscw:write');
 
         $this->modelManager = $modelManager;
@@ -112,8 +96,6 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
 
         $this->addOption('skipRebuild');
     }
-
-
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -164,7 +146,6 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         $output->writeln('');
         $output->writeln('<info>Finished writing Product Categories</info>');
         unset($articleCategories, $progressBar);
-
 
         $articleCategories = $this->getSortedArticleArray($categoriesWithProductStreams, true, $output);
 
@@ -235,8 +216,6 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         }
     }
 
-
-
     /**
      * @param int $shopId
      *
@@ -258,8 +237,6 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
 
         return $this->contextService->createShopContext($shopId, $currencyId, $customerGroupKey);
     }
-
-
 
     /**
      * @return array[]
@@ -283,8 +260,6 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         return $data;
     }
 
-
-
     /**
      * @param $arrayString
      *
@@ -298,8 +273,6 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         return explode('|', $arrayString);
     }
 
-
-
     private function getSortedArticleArray(array $categoriesWithProductStreams, $noCategoryCondition = false, OutputInterface $output): array
     {
         $articleCategories = [];
@@ -307,7 +280,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         $pb->start();
         foreach ($categoriesWithProductStreams as $categoryID => $productStreams) {
             foreach ($productStreams as $productStream) {
-                $articles = $this->getArticlesForProductStream((int)$productStream, $noCategoryCondition);
+                $articles = $this->getArticlesForProductStream((int) $productStream, $noCategoryCondition);
 
                 foreach ($articles as $article) {
                     $articleCategories[$article][] = $categoryID;
@@ -321,10 +294,8 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         return $articleCategories;
     }
 
-
-
     /**
-     * @param int $streamID
+     * @param int  $streamID
      * @param bool $noCategoryCondition
      *
      * @return int[]
@@ -374,7 +345,6 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
 
         $productQuery = $this->queryBuilderFactory->createProductQuery($criteria, $this->shopContext);
 
-
         $queryJoins = $productQuery->getQueryPart('join');
 
         foreach ($queryJoins as $fromAlias => &$queryJoin) {
@@ -394,8 +364,6 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             return $entry['__product_id'];
         }, $productQuery->execute()->fetchAll(\PDO::FETCH_ASSOC));
     }
-
-
 
     private function updateArticle(int $article, array $categories)
     {
