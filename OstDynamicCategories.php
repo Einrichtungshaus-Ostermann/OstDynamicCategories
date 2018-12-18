@@ -8,6 +8,9 @@
  * 1.0.0
  * - initial release
  *
+ * 1.0.1
+ * - fixed multiple category assignments
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
