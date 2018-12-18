@@ -22,8 +22,6 @@ abstract class SearchLiveCondition implements ConditionInterface
      */
     private $term;
 
-
-
     /**
      * SearchCondition constructor.
      *
@@ -34,8 +32,6 @@ abstract class SearchLiveCondition implements ConditionInterface
         $this->term = $term;
     }
 
-
-
     /**
      * Defines the unique name for the facet for re identification.
      *
@@ -45,8 +41,6 @@ abstract class SearchLiveCondition implements ConditionInterface
     {
         return 'SearchConditon';
     }
-
-
 
     /**
      * @return string

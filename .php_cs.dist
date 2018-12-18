@@ -23,7 +23,6 @@ return PhpCsFixer\Config::create()
         'binary_operator_spaces' => [
           'align_double_arrow' => true
         ],
-        'no_extra_blank_lines' => [],
         'phpdoc_no_empty_return' => true,
         'phpdoc_order' => true,
         'phpdoc_types' => true,

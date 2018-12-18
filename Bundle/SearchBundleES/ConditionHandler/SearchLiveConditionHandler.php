@@ -26,18 +26,14 @@ abstract class SearchLiveConditionHandler implements PartialConditionHandlerInte
         Criteria $criteria,
         Search $search,
         ShopContextInterface $context
-    )
-    {
+    ) {
     }
-
-
 
     public function handlePostFilter(
         CriteriaPartInterface $criteriaPart,
         Criteria $criteria,
         Search $search,
         ShopContextInterface $context
-    )
-    {
+    ) {
     }
 }

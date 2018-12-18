@@ -22,8 +22,6 @@ class SearchTitleLiveConditionHandler extends SearchLiveConditionHandler
         'UPPER(product.name)',
     ];
 
-
-
     /**
      * Checks if the passed condition can be handled by this class.
      *

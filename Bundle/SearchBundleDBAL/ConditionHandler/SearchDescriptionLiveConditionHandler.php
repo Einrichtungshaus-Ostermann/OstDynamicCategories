@@ -22,8 +22,6 @@ class SearchDescriptionLiveConditionHandler extends SearchLiveConditionHandler
         'UPPER(product.description_long)',
     ];
 
-
-
     /**
      * Checks if the passed condition can be handled by this class.
      *

@@ -21,20 +21,16 @@ class BackendSubscriber implements SubscriberInterface
 {
     private $snippets;
 
-
-
     /**
      * @var EntityManagerInterface
      */
     private $entityManager;
 
-
-
     /**
      * BackendSubscriber constructor.
      *
      * @param Shopware_Components_Snippet_Manager $snippets
-     * @param EntityManagerInterface $entityManager
+     * @param EntityManagerInterface              $entityManager
      */
     public function __construct(Shopware_Components_Snippet_Manager $snippets, EntityManagerInterface $entityManager)
     {
@@ -42,16 +38,12 @@ class BackendSubscriber implements SubscriberInterface
         $this->entityManager = $entityManager;
     }
 
-
-
     public static function getSubscribedEvents()
     {
         return [
             'Enlight_Controller_Action_PostDispatch_Backend_ProductStream' => 'extendProductStream'
         ];
     }
-
-
 
     public function extendProductStream(\Enlight_Event_EventArgs $args)
     {

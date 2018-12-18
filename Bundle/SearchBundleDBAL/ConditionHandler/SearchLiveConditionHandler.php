@@ -23,23 +23,20 @@ abstract class SearchLiveConditionHandler implements ConditionHandlerInterface
 {
     protected $searchFields = [];
 
-
-
     /**
      * Handles the passed condition object.
      * Extends the provided query builder with the specify conditions.
      * Should use the andWhere function, otherwise other conditions would be overwritten.
      *
-     * @param ConditionInterface $condition
-     * @param QueryBuilder $query
+     * @param ConditionInterface   $condition
+     * @param QueryBuilder         $query
      * @param ShopContextInterface $context
      */
     public function generateCondition(
         ConditionInterface $condition,
         QueryBuilder $query,
         ShopContextInterface $context
-    )
-    {
+    ) {
         if (!($condition instanceof SearchLiveCondition)) {
             return;
         }
