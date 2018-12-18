@@ -198,7 +198,8 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             }
 
             $output->writeln('<info>Executing Category Tree Rebuild</info>');
-            $this->modelManager->getConnection()->exec('create temporary table cat_pathIds
+            $this->modelManager->getConnection()->exec(
+                'create temporary table cat_pathIds
                                                                         select id, pathId from (
                                                                             select id, path, id as pathId from s_categories where path is not null
                                                                             union select id, path, 0+SUBSTRING_INDEX(path,\'|\',1) pathId from s_categories where path is not null
@@ -402,13 +403,17 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         foreach ($categories as $category) {
             $qb = $this->modelManager->getDBALQueryBuilder();
 
-            $qb = $qb->insert('s_articles_categories')
-                ->values([
-                    'articleID'  => $article,
-                    'categoryID' => $category
-                ]);
-            $qb->execute();
-            unset($qb);
+            try {
+                $qb = $qb->insert('s_articles_categories')
+                    ->values([
+                        'articleID'  => $article,
+                        'categoryID' => $category
+                    ]);
+                $qb->execute();
+                unset($qb);
+            } catch (\Exception $e) {
+                //Insert ignore
+            }
         }
     }
 }
