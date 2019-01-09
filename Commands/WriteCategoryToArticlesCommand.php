@@ -86,7 +86,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         QueryBuilderFactoryInterface $queryBuilderFactory,
         CategoryServiceInterface $categoryService
     ) {
-        parent::__construct('pscw:write');
+        parent::__construct('ost-dynamic-category:rebuild-categories');
 
         $this->modelManager = $modelManager;
         $this->repository = $repository;

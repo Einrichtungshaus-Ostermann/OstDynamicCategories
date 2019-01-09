@@ -53,6 +53,6 @@
             <argument type="service" id="snippets"/>
             <argument type="service" id="models"/>
         </service>
-        
+
     </services>
 </container>

@@ -13,6 +13,7 @@
  *
  * 1.0.2
  * - fixed plugin descriptions
+ * - changed command to ost-dynamic-category:rebuild-categories
  *
  * @package   OstDynamicCategories
  *
