@@ -2,33 +2,10 @@
 <plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="../../../engine/Shopware/Components/Plugin/schema/plugin.xsd">
 
-    <label>Dynamische Kategorien</label>
-    <label lang="en">Dynamic Categories</label>
-    <version>1.0.1</version>
+    <label>Dynamische Kategorien via Product Streams</label>
+    <version>1.0.2</version>
     <copyright><![CDATA[Einrichtungshaus Ostermann GmbH & Co. KG]]></copyright>
     <link>https://www.ostermann.de</link>
     <author><![CDATA[Einrichtungshaus Ostermann GmbH & Co. KG]]></author>
     <compatibility minVersion="5.5.0" />
-
-    <description lang="de">
-        Das Plugin fügt einen Konsolen Befehl hinzu, womit die Kategorien, welche einen ProductStream haben die Artikel
-        von diesem zugeordnet bekommen.
-
-
-        Desweiteren werden zwei neue Filter hinzugefügt, "Artikel Name Filter" und der "Artikel Beschreibung Filter".
-        Diese Filter nehmen die Suchbegriffe Semikolon getrennt für eine oder-Verbindung und mit leerzeichen getrennt
-        für eine und-Verbindung.
-
-        Beispiel: "Lavalampe;Lampe e17" Es würden alle Artikel mit "Lavalampe" oder mit "Lampe" und "e17" gefunden
-        werden.
-
-
-
-        "Keine Kategorie Filter" ist dazu da um diesen Stream nicht beim ersten lauf zu nutzen, sondern erst wenn alle anderen Streams durchgelaufen sind.
-        Damit kann man dann alle Artikel greifen die bei den normalen Streams keine Kategorie bekommen haben in eine Zubehör Kategorie eintragen.
-
-
-
-        Die Ausführung erfolgt über den "pscw:write" befehl, welcher auch eine Subshop ID annehemen kann.
-    </description>
 </plugin>

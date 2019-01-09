@@ -11,6 +11,9 @@
  * 1.0.1
  * - fixed multiple category assignments
  *
+ * 1.0.2
+ * - fixed plugin descriptions
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>

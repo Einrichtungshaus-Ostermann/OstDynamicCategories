@@ -78,10 +78,15 @@ class Install
                 'category_writer_stream_ids',
                 'multi_selection',
                 [
-                    'entity'           => ProductStream::class,
+                    'label'            => "Product Streams",
+                    'helpText'         => "Die Kategorie enthält alle Artikel, der ausgewählten Product Streams. Bitte beachten Sie, dass die Verknüpfungen via console command angelegt werden müssen.",
+                    'translatable'     => false,
+                    'position'         => 500,
                     'displayInBackend' => true,
-                    'label'            => 'Productstreams for Categorywriter',
+                    'custom'           => false,
+                    'entity'           => ProductStream::class,
                 ],
+
                 null,
                 true
             );

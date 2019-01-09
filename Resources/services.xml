@@ -3,8 +3,8 @@
            xmlns="http://symfony.com/schema/dic/services"
            xsi:schemaLocation="http://symfony.com/schema/dic/services
         http://symfony.com/schema/dic/services/services-1.0.xsd">
-
     <services>
+
         <service id="ost_dynamic_categories.commands.write_category_to_articles_command"
                  class="OstDynamicCategories\Commands\WriteCategoryToArticlesCommand">
             <tag name="console.command"/>
@@ -53,5 +53,6 @@
             <argument type="service" id="snippets"/>
             <argument type="service" id="models"/>
         </service>
+        
     </services>
 </container>
