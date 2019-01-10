@@ -79,7 +79,7 @@ class Install
                 'multi_selection',
                 [
                     'label'            => "Product Streams",
-                    'helpText'         => "Die Kategorie enthält alle Artikel, der ausgewählten Product Streams. Bitte beachten Sie, dass die Verknüpfungen via console command angelegt werden müssen.",
+                    'helpText'         => "Die Kategorie enthält alle Artikel der ausgewählten Product Streams. Bitte beachten Sie, dass die Verknüpfungen von Artikeln zu Kategorien via console command aktualisiert werden müssen.",
                     'translatable'     => false,
                     'position'         => 500,
                     'displayInBackend' => true,

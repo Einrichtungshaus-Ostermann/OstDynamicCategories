@@ -15,6 +15,9 @@
  * - fixed plugin descriptions
  * - changed command to ost-dynamic-category:rebuild-categories
  *
+ * 1.0.3
+ * - fixed attribute help text
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
