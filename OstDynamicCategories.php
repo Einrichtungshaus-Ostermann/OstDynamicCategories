@@ -18,6 +18,9 @@
  * 1.0.3
  * - fixed attribute help text
  *
+ * 1.0.4
+ * - fixed width of product stream name in category attributes in backend
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
