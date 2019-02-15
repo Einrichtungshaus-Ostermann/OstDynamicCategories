@@ -41,6 +41,7 @@ abstract class SearchLiveConditionHandler implements ConditionHandlerInterface
             return;
         }
 
+        /** @var SearchLiveCondition $condition */
         $term = $condition->getTerm();
         $orTerms = explode(';', $term);
 
@@ -59,14 +60,27 @@ abstract class SearchLiveConditionHandler implements ConditionHandlerInterface
                 foreach ($andTerms as $andTerm) {
                     $id = 'term' . random_int(0, PHP_INT_MAX - 1);
                     $parameter[$id] = '%' . strtoupper($andTerm) . '%';
-                    $likeConditions[] = $query->expr()->orX(
-                        $query->expr()->like($searchField, ':' . $id),
-                        $query->expr()->eq($searchField, ':' . $id)
-                    );
+
+                    if ($condition->isNot()) {
+                        $likeConditions[] = $query->expr()->andX(
+                            $query->expr()->notLike($searchField, ':' . $id),
+                            $query->expr()->neq($searchField, ':' . $id)
+                        );
+                    } else {
+                        $likeConditions[] = $query->expr()->orX(
+                            $query->expr()->like($searchField, ':' . $id),
+                            $query->expr()->eq($searchField, ':' . $id)
+                        );
+                    }
                 }
+
                 $orConditions[] = $query->expr()->andX(...$likeConditions);
             }
-            $andConditions[] = $query->expr()->orX(...$orConditions);
+            if ($condition->isNot()) {
+                $andConditions[] = $query->expr()->andX(...$orConditions);
+            } else {
+                $andConditions[] = $query->expr()->orX(...$orConditions);
+            }
         }
 
         foreach ($parameter as $parameterName => $term) {

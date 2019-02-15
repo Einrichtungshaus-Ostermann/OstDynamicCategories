@@ -14,6 +14,7 @@
 namespace OstDynamicCategories\Bundle\SearchBundleDBAL\ConditionHandler;
 
 use OstDynamicCategories\Bundle\SearchBundle\Condition\SearchDescriptionLiveCondition;
+use OstDynamicCategories\Bundle\SearchBundle\Condition\SearchDescriptionNotLiveCondition;
 use Shopware\Bundle\SearchBundle\ConditionInterface;
 
 class SearchDescriptionLiveConditionHandler extends SearchLiveConditionHandler
@@ -31,6 +32,6 @@ class SearchDescriptionLiveConditionHandler extends SearchLiveConditionHandler
      */
     public function supportsCondition(ConditionInterface $condition)
     {
-        return $condition instanceof SearchDescriptionLiveCondition;
+        return $condition instanceof SearchDescriptionLiveCondition || $condition instanceof SearchDescriptionNotLiveCondition;
     }
 }

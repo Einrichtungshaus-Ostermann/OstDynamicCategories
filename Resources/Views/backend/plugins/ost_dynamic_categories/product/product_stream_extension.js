@@ -13,7 +13,9 @@ Ext.define('Shopware.apps.OstDynamicCategories.ProductStream.view.condition_list
 
         //push own handler into
         handlers.push(Ext.create('Shopware.apps.OstDynamicCategories.view.condition_list.condition.TitleLiveSearchCondition'));
+        handlers.push(Ext.create('Shopware.apps.OstDynamicCategories.view.condition_list.condition.TitleLiveNotSearchCondition'));
         handlers.push(Ext.create('Shopware.apps.OstDynamicCategories.view.condition_list.condition.DescriptionLiveSearchCondition'));
+        handlers.push(Ext.create('Shopware.apps.OstDynamicCategories.view.condition_list.condition.DescriptionLiveNotSearchCondition'));
         handlers.push(Ext.create('Shopware.apps.OstDynamicCategories.view.condition_list.condition.NoCategoryLiveSearchCondition'));
 
         //return modified handlers array
@@ -58,6 +60,41 @@ Ext.define('Shopware.apps.OstDynamicCategories.view.condition_list.condition.Tit
     }
 });
 
+Ext.define('Shopware.apps.OstDynamicCategories.view.condition_list.condition.TitleLiveNotSearchCondition', {
+    extend: 'Shopware.apps.ProductStream.view.condition_list.condition.AbstractCondition',
+
+    getName: function () {
+        return 'OstDynamicCategories\\Bundle\\SearchBundle\\Condition\\SearchTitleNotLiveCondition';
+    },
+
+    getLabel: function () {
+        return '{s name=live_title_not_search_condition}{/s}';
+    },
+
+    isSingleton: function () {
+        return true;
+    },
+
+    create: function (callback) {
+        callback(this.createField());
+    },
+
+    load: function (key, value) {
+        if (key !== this.getName()) {
+            return;
+        }
+        var field = this.createField();
+        field.setValue(value);
+        return field;
+    },
+
+    createField: function () {
+        return Ext.create('Shopware.apps.ProductStream.view.condition_list.field.SearchTerm', {
+            flex: 1,
+            name: 'condition.' + this.getName()
+        });
+    }
+});
 
 Ext.define('Shopware.apps.OstDynamicCategories.view.condition_list.condition.DescriptionLiveSearchCondition', {
     extend: 'Shopware.apps.ProductStream.view.condition_list.condition.AbstractCondition',
@@ -68,6 +105,42 @@ Ext.define('Shopware.apps.OstDynamicCategories.view.condition_list.condition.Des
 
     getLabel: function () {
         return '{s name=live_description_search_condition}{/s}';
+    },
+
+    isSingleton: function () {
+        return true;
+    },
+
+    create: function (callback) {
+        callback(this.createField());
+    },
+
+    load: function (key, value) {
+        if (key !== this.getName()) {
+            return;
+        }
+        var field = this.createField();
+        field.setValue(value);
+        return field;
+    },
+
+    createField: function () {
+        return Ext.create('Shopware.apps.ProductStream.view.condition_list.field.SearchTerm', {
+            flex: 1,
+            name: 'condition.' + this.getName()
+        });
+    }
+});
+
+Ext.define('Shopware.apps.OstDynamicCategories.view.condition_list.condition.DescriptionLiveNotSearchCondition', {
+    extend: 'Shopware.apps.ProductStream.view.condition_list.condition.AbstractCondition',
+
+    getName: function () {
+        return 'OstDynamicCategories\\Bundle\\SearchBundle\\Condition\\SearchDescriptionNotLiveCondition';
+    },
+
+    getLabel: function () {
+        return '{s name=live_description_not_search_condition}{/s}';
     },
 
     isSingleton: function () {

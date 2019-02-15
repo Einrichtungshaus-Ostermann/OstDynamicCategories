@@ -21,11 +21,16 @@ abstract class SearchLiveCondition implements ConditionInterface
      * @var string
      */
     private $term;
+    /**
+     * @var bool
+     */
+    protected $not = false;
 
     /**
      * SearchCondition constructor.
      *
      * @param string $term
+     * @param bool $not
      */
     public function __construct(string $term)
     {
@@ -48,5 +53,13 @@ abstract class SearchLiveCondition implements ConditionInterface
     public function getTerm()
     {
         return $this->term;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNot()
+    {
+        return $this->not;
     }
 }
