@@ -18,8 +18,9 @@
  * 1.0.3
  * - fixed attribute help text
  *
- * 1.0.4
+ * 1.1.0
  * - fixed width of product stream name in category attributes in backend
+ * - added filters for not-in-name and not-in-description
  *
  * @package   OstDynamicCategories
  *
