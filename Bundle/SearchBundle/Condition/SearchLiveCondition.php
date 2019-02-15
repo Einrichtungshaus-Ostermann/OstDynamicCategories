@@ -44,7 +44,8 @@ abstract class SearchLiveCondition implements ConditionInterface
      */
     public function getName()
     {
-        return 'SearchConditon';
+        $path = explode('\\', static::class);
+        return array_pop($path);
     }
 
     /**
