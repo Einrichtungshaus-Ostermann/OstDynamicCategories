@@ -28,15 +28,16 @@ abstract class SearchLiveConditionHandler implements ConditionHandlerInterface
      * Extends the provided query builder with the specify conditions.
      * Should use the andWhere function, otherwise other conditions would be overwritten.
      *
-     * @param ConditionInterface   $condition
-     * @param QueryBuilder         $query
+     * @param ConditionInterface $condition
+     * @param QueryBuilder $query
      * @param ShopContextInterface $context
      */
     public function generateCondition(
         ConditionInterface $condition,
         QueryBuilder $query,
         ShopContextInterface $context
-    ) {
+    )
+    {
         if (!($condition instanceof SearchLiveCondition)) {
             return;
         }
@@ -59,7 +60,26 @@ abstract class SearchLiveConditionHandler implements ConditionHandlerInterface
                 $likeConditions = [];
                 foreach ($andTerms as $andTerm) {
                     $id = 'term' . random_int(0, PHP_INT_MAX - 1);
-                    $parameter[$id] = '%' . strtoupper($andTerm) . '%';
+
+                    $andTerm = strtoupper($andTerm);
+
+                    if (strpos($andTerm, '^') === 0) {
+                        $andTerm = ' ' . substr($andTerm, 1);
+                    }
+
+                    if (strpos($andTerm, '$') === strlen($andTerm) - 1) {
+                        $andTerm = substr($andTerm, 0, -1) . ' ';
+                    }
+
+                    if (strpos($andTerm, '!') !== 0) {
+                        $andTerm = '%' . $andTerm;
+                    }
+
+                    if (strpos($andTerm, '!') !== strlen($andTerm) - 1) {
+                        $andTerm .= '%';
+                    }
+
+                    $parameter[$id] = $andTerm;
 
                     if ($condition->isNot()) {
                         $likeConditions[] = $query->expr()->andX(
