@@ -73,10 +73,14 @@ abstract class SearchLiveConditionHandler implements ConditionHandlerInterface
 
                     if (strpos($andTerm, '!') !== 0) {
                         $andTerm = '%' . $andTerm;
+                    } else {
+                        $andTerm = substr($andTerm, 1);
                     }
 
                     if (strpos($andTerm, '!') !== strlen($andTerm) - 1) {
                         $andTerm .= '%';
+                    } else {
+                        $andTerm = substr($andTerm, 1);
                     }
 
                     $parameter[$id] = $andTerm;
