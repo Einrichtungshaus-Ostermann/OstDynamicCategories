@@ -14,7 +14,8 @@ Desweiteren können Sonderfälle mit den Zeichen `!^$` definiert werden.
 - `$`: Am Ende eines Wortes um ein Leerzeichen in der Query zu enforcen und so den Ende des Wortes zu erzwingen
 - `!`: Am Anfang oder Ende eines Wortes, um die `%` in der SQL Query entfallen zu lassen 
 
-Beispiel: `!Sessel ^Sessel$ ^Sessel!` würde alle Artikel mit Sessel am Anfang, alle mit Sessel als einzelwort und alle mit Sessel am Ende finden. 
+Beispiel: `!Sessel ^Sessel$ ^Sessel!` würde alle Artikel mit Sessel am Anfang, alle mit Sessel als Einzelwort und 
+alle mit Sessel am Ende finden. 
 
 "Keine Kategorie Filter" ist dazu da um diesen Stream nicht beim ersten lauf zu nutzen, sondern erst wenn alle
 anderen Streams durchgelaufen sind. Damit kann man dann alle Artikel greifen die bei den normalen Streams keine 

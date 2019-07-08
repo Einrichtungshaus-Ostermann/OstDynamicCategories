@@ -22,6 +22,9 @@
  * - fixed width of product stream name in category attributes in backend
  * - added filters for not-in-name and not-in-description
  *
+ * 1.1.1
+ * - added syntax to search with explicit spaces
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
