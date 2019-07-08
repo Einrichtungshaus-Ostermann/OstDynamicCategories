@@ -22,8 +22,14 @@
  * - fixed width of product stream name in category attributes in backend
  * - added filters for not-in-name and not-in-description
  *
- * 1.1.1
+ * 1.2.0
  * - added syntax to search with explicit spaces
+ *
+ * 1.2.1
+ * - added missing substring
+ *
+ * 1.2.2
+ * - fixed versioning
  *
  * @package   OstDynamicCategories
  *
