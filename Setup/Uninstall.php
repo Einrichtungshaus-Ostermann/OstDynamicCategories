@@ -16,6 +16,7 @@ use Shopware\Bundle\AttributeBundle\Service\CrudService;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\UninstallContext;
+use Exception;
 
 class Uninstall
 {
@@ -71,18 +72,29 @@ class Uninstall
      */
     public function uninstall()
     {
-        if ($this->context->keepUserData()) {
-            return true;
+        // ...
+        $this->uninstallAttributes();
+    }
+    /**
+     * ...
+     *
+     * @throws \Exception
+     */
+    public function uninstallAttributes()
+    {
+        // ...
+        foreach (Install::$attributes as $table => $attributes) {
+            foreach ($attributes as $attribute) {
+                try {
+                    $this->crudService->delete(
+                        $table,
+                        $attribute['column']
+                    );
+                } catch (Exception $exception) {
+                }
+            }
         }
-        try {
-            $this->crudService->delete(
-                's_categories_attributes',
-                'category_writer_stream_ids'
-            );
-        } catch (\Exception $e) {
-            return false;
-        }
-
-        return true;
+        // ...
+        $this->modelManager->generateAttributeModels(array_keys(Install::$attributes));
     }
 }

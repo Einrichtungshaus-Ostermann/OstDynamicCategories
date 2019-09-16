@@ -31,6 +31,9 @@
  * 1.2.2
  * - fixed versioning
  *
+ * 1.3.0
+ * - added seo url association
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
@@ -84,16 +87,16 @@ class OstDynamicCategories extends Plugin
         // install the plugin
         $installer = new Setup\Install(
             $this,
-            $context,
-            $this->container->get('models'),
-            $this->container->get('shopware_attribute.crud_service')
+            $context
         );
         $installer->install();
 
         // update it to current version
         $updater = new Setup\Update(
             $this,
-            $context
+            $context,
+            $this->container->get('models'),
+            $this->container->get('shopware_attribute.crud_service')
         );
         $updater->install();
 
@@ -111,7 +114,9 @@ class OstDynamicCategories extends Plugin
         // update the plugin
         $updater = new Setup\Update(
             $this,
-            $context
+            $context,
+            $this->container->get('models'),
+            $this->container->get('shopware_attribute.crud_service')
         );
         $updater->update($context->getCurrentVersion());
 

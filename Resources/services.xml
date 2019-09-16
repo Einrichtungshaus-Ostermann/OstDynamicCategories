@@ -7,7 +7,7 @@
 
         <service id="ost_dynamic_categories.commands.write_category_to_articles_command"
                  class="OstDynamicCategories\Commands\WriteCategoryToArticlesCommand">
-            <tag name="console.command"/>
+            <tag name="console.command" command="ost-dynamic-category:rebuild-categories"/>
             <argument type="service" id="models"/>
             <argument type="service" id="shopware_product_stream.repository"/>
             <argument type="service" id="shopware_storefront.context_service"/>

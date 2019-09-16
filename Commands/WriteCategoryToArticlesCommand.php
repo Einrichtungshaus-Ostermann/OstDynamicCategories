@@ -15,27 +15,28 @@
 namespace OstDynamicCategories\Commands;
 
 use Doctrine\DBAL\DBALException;
+use Exception;
 use OstDynamicCategories\Bundle\SearchBundle\Condition\NoCategoryLiveCondition;
+use PDO;
 use Shopware\Bundle\ESIndexingBundle\Struct\Backlog;
 use Shopware\Bundle\ESIndexingBundle\Subscriber\ORMBacklogSubscriber;
+use Shopware\Bundle\SearchBundle\ConditionInterface;
 use Shopware\Bundle\SearchBundle\Criteria;
 use Shopware\Bundle\SearchBundleDBAL\QueryBuilderFactoryInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\CategoryServiceInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\ContextServiceInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\Core\ContextService;
 use Shopware\Bundle\StoreFrontBundle\Struct\ShopContext;
+use Shopware\Bundle\StoreFrontBundle\Struct\ShopContextInterface;
 use Shopware\Commands\ShopwareCommand;
 use Shopware\Components\Model\ModelManager;
-use Shopware\Components\Plugin\ConfigReader;
-use Shopware\Components\Plugin\ConfigWriter;
 use Shopware\Components\ProductStream\RepositoryInterface;
 use Shopware\Models\ProductStream\ProductStream;
 use Shopware\Models\Shop\Shop;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use function count;
 
 class WriteCategoryToArticlesCommand extends ShopwareCommand
 {
@@ -60,16 +61,6 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
     private $queryBuilderFactory;
 
     /**
-     * @var ConfigReader
-     */
-    private $configReader;
-
-    /**
-     * @var ConfigWriter
-     */
-    private $configWriter;
-
-    /**
      * @var CategoryServiceInterface
      */
     private $categoryService;
@@ -85,8 +76,9 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         ContextServiceInterface $contextService,
         QueryBuilderFactoryInterface $queryBuilderFactory,
         CategoryServiceInterface $categoryService
-    ) {
-        parent::__construct('ost-dynamic-category:rebuild-categories');
+    )
+    {
+        parent::__construct();
 
         $this->modelManager = $modelManager;
         $this->repository = $repository;
@@ -94,6 +86,10 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         $this->queryBuilderFactory = $queryBuilderFactory;
         $this->categoryService = $categoryService;
 
+    }
+
+    protected function configure()
+    {
         $this->addOption('skipRebuild');
     }
 
@@ -104,6 +100,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         $output->writeln('<info>Collecting Categories</info>');
         $categoriesWithProductStreams = $this->getCategoriesWithProductStreams();
 
+        // Clearing s_article_categories
         try {
             $output->writeln('<info>Truncating s_articles_categories</info>');
             $this->modelManager->getConnection()->exec('TRUNCATE s_articles_categories');
@@ -113,6 +110,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             return;
         }
 
+        // Clearing s_articles_categories_ro
         try {
             $output->writeln('<info>Truncating s_articles_categories_ro</info>');
             $this->modelManager->getConnection()->exec('TRUNCATE s_articles_categories_ro');
@@ -122,57 +120,73 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             return;
         }
 
-        $output->writeln('<info>Sorting Categories</info>');
-        $articleCategories = $this->getSortedArticleArray($categoriesWithProductStreams, false, $output);
+        // Clearing s_articles_categories_seo
+        try {
+            $output->writeln('<info>Truncating s_articles_categories_seo</info>');
+            $this->modelManager->getConnection()->exec('TRUNCATE s_articles_categories_seo');
+        } catch (DBALException $e) {
+            $output->writeln('<error>Error truncating s_articles_categories_seo</error>');
 
+            return;
+        }
+
+        $progressBar = new ProgressBar($output);
+        $progressBar->setFormat('very_verbose');
+        $progressBar->setRedrawFrequency(200);
         $backlog = [];
-        $output->writeln('<info>Writing Product Categories</info>');
 
-        $progressBar = new ProgressBar($output, \count($articleCategories));
-        $progressBar->setFormat('very_verbose');
-        $progressBar->setRedrawFrequency(200);
-        $progressBar->start();
+        $output->writeln('<info>Sorting Categories</info>');
+        $articleCategories = $this->getSortedArticleArray($categoriesWithProductStreams, $progressBar, false);
+        $output->writeln('');
 
-        foreach ($articleCategories as $article => $categories) {
-            $progressBar->setMessage('Writing Article: ' . $article);
+        if (count($articleCategories) !== 0) {
+            $output->writeln('<info>Writing Product Categories</info>');
 
-            $this->updateArticle($article, $categories);
-            $backlog[] = new Backlog(ORMBacklogSubscriber::EVENT_ARTICLE_UPDATED, ['id' => $article]);
+            $this->writeArticleCategories($articleCategories, $progressBar, $backlog);
 
-            $progressBar->advance();
+            $output->writeln('');
+            $output->writeln('<info>Finished writing Product Categories</info>');
+        } else {
+            $output->writeln('<info>No Products found</info>');
+        }
+        unset($articleCategories);
+
+        $output->writeln('<info>Sorting Categories</info>');
+        $articleCategories = $this->getSortedArticleArray($categoriesWithProductStreams, $progressBar, true);
+        $output->writeln('');
+
+        if (count($articleCategories) !== 0) {
+            $output->writeln('<info>Writing Product Categories for NoCategoryStreams</info>');
+
+            $this->writeArticleCategories($articleCategories, $progressBar, $backlog);
+
+            $output->writeln('');
+            $output->writeln('<info>Finished writing Product Categories for NoCategoryStreams</info>');
+        } else {
+            $output->writeln('<info>No Products found</info>');
         }
 
-        $progressBar->finish();
-        $output->writeln('');
-        $output->writeln('<info>Finished writing Product Categories</info>');
-        unset($articleCategories, $progressBar);
 
-        $articleCategories = $this->getSortedArticleArray($categoriesWithProductStreams, true, $output);
+        $output->writeln('<info>Sorting SEO Categories</info>');
+        $seoCategories = $this->buildSeoCategoryAssociation();
 
-        $output->writeln('<info>Writing Product Categories for NoCategoryStreams</info>');
+        if (count($articleCategories) !== 0) {
+            $output->writeln('<info>Writing Product SEO Categories</info>');
 
-        $progressBar = new ProgressBar($output, \count($articleCategories));
-        $progressBar->setFormat('very_verbose');
-        $progressBar->setRedrawFrequency(200);
-        $progressBar->start();
+            $progressBar->start(count($seoCategories));
+            foreach ($seoCategories as $articleID => $seoCategory) {
+                $this->writeArticleSeoCategory($articleID, $seoCategory);
+                $progressBar->advance();
+            }
+            $progressBar->finish();
 
-        foreach ($articleCategories as $article => $categories) {
-            $progressBar->setMessage('Writing Article: ' . $article);
-
-            $this->updateArticle($article, $categories);
-            $backlog[] = new Backlog(ORMBacklogSubscriber::EVENT_ARTICLE_UPDATED, ['id' => $article]);
-
-            $progressBar->advance();
+            $output->writeln('');
+            $output->writeln('<info>Finished writing Product SEO Categories</info>');
+        } else {
+            $output->writeln('<info>No SEO Categories found</info>');
         }
-
-        $progressBar->finish();
-        $output->writeln('');
-        $output->writeln('<info>Finished writing Product Categories for NoCategoryStreams</info>');
 
         if (!$input->getOption('skipRebuild')) {
-            $emptyInput = new ArrayInput([]);
-            $nullOutput = new NullOutput();
-
             if ($this->container->getParameter('shopware.es.enabled')) {
                 $output->writeln('<info>Writing Backlog</info>');
                 $this->container->get('shopware_elastic_search.backlog_processor')->add($backlog);
@@ -217,10 +231,25 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         }
     }
 
+    private function writeArticleCategories(array $articleCategories, ProgressBar $progressBar, array &$backlog = [])
+    {
+        $progressBar->start(count($articleCategories));
+        foreach ($articleCategories as $article => $categories) {
+            $progressBar->setMessage('Writing Article: ' . $article);
+
+            $this->writeArticleCategory($article, $categories);
+            $backlog[] = new Backlog(ORMBacklogSubscriber::EVENT_ARTICLE_UPDATED, ['id' => $article]);
+
+            /** @noinspection DisconnectedForeachInstructionInspection */
+            $progressBar->advance();
+        }
+        $progressBar->finish();
+    }
+
     /**
      * @param int $shopId
      *
-     * @return null|\Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface
+     * @return null|ShopContextInterface
      */
     private function getShopContext($shopId = 1)
     {
@@ -248,10 +277,11 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         $qb = $qb
             ->select('category.id AS id')
             ->addSelect('category_attribute.category_writer_stream_ids AS streamIDs')
+            ->addSelect('category_attribute.category_writer_seo_priority AS seoPriority')
             ->from('s_categories', 'category')
             ->innerJoin('category', 's_categories_attributes', 'category_attribute', 'category.id = category_attribute.categoryID')
             ->where('category_attribute.category_writer_stream_ids IS NOT NULL');
-        $categoriesWithStreams = $qb->execute()->fetchAll(\PDO::FETCH_ASSOC);
+        $categoriesWithStreams = $qb->execute()->fetchAll(PDO::FETCH_ASSOC);
 
         $data = [];
         foreach ($categoriesWithStreams as $row) {
@@ -260,6 +290,85 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
 
         return $data;
     }
+
+    /**
+     * @return array
+     */
+    private function buildSeoCategoryAssociation(): array
+    {
+        $qb = $this->modelManager->getDBALQueryBuilder();
+        $qb = $qb
+            ->select('articleID')
+            ->addSelect('categoryID')
+            ->from('s_articles_categories', 'ac');
+        $articleCategoriesResult = $qb->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+        $sortedCategories = [];
+        foreach ($articleCategoriesResult as $row) {
+            $sortedCategories[$row['articleID']][] = $row['categoryID'];
+        }
+        unset($articleCategoriesResult);
+
+        $qb = $this->modelManager->getDBALQueryBuilder();
+        $qb = $qb
+            ->select('category.id AS id')
+            ->addSelect('category.path AS path')
+            ->addSelect('category_attribute.category_writer_seo_priority AS seoPriority')
+            ->from('s_categories', 'category')
+            ->innerJoin('category', 's_categories_attributes', 'category_attribute', 'category.id = category_attribute.categoryID');
+        $categoriesResult = $qb->execute()->fetchAll(PDO::FETCH_ASSOC);
+
+        $categoryData = [];
+        foreach ($categoriesResult as $row) {
+            if ($row['path'] === null) {
+                continue;
+            }
+
+            $categoryData[$row['id']] = [
+                'id' => $row['id'],
+                'path' => $this->getArrayStringAsArray($row['path']),
+                'seoPriority' => $row['seoPriority'],
+            ];
+        }
+        unset($categoriesResult);
+
+        $data = [];
+        foreach ($sortedCategories as $article => $articleCategories) {
+            $seoCategory = null;
+            $currentPriority = 0;
+            foreach ($articleCategories as $articleCategory) {
+                $articleCategory = $categoryData[$articleCategory];
+
+                if ($articleCategory['seoPriority'] !== null) {
+                    if ($articleCategory['seoPriority'] > $currentPriority) {
+                        $seoCategory = $articleCategory;
+                        $currentPriority = $seoCategory['seoPriority'];
+                    }
+
+                    continue;
+                }
+
+                foreach ($categoryData['path'] as $categoryPath) {
+                    $categoryPath = $categoryData[$categoryPath];
+                    if ($categoryPath['seoPriority'] === null) {
+                        continue;
+                    }
+
+                    if ($categoryPath['seoPriority'] > $currentPriority) {
+                        $seoCategory = $categoryPath;
+                        $currentPriority = $seoCategory['seoPriority'];
+                    }
+                }
+            }
+
+            if ($seoCategory !== null) {
+                $data[$article] = (int) $seoCategory['id'];
+            }
+        }
+
+        return $data;
+    }
+
 
     /**
      * @param $arrayString
@@ -274,29 +383,34 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         return explode('|', $arrayString);
     }
 
-    private function getSortedArticleArray(array $categoriesWithProductStreams, $noCategoryCondition = false, OutputInterface $output): array
+    /**
+     * Get Article-Category association for the given ProductStreams
+     * @param array $categoriesWithProductStreams
+     * @param ProgressBar $progressBar
+     * @param $noCategoryCondition
+     * @return array
+     */
+    private function getSortedArticleArray(array $categoriesWithProductStreams, ProgressBar $progressBar, $noCategoryCondition): array
     {
         $articleCategories = [];
-        $pb = new ProgressBar($output, \count($categoriesWithProductStreams));
-        $pb->start();
+        $progressBar->start(count($categoriesWithProductStreams));
         foreach ($categoriesWithProductStreams as $categoryID => $productStreams) {
             foreach ($productStreams as $productStream) {
-                $articles = $this->getArticlesForProductStream((int) $productStream, $noCategoryCondition);
+                $articles = $this->getArticlesForProductStream((int)$productStream, $noCategoryCondition);
 
                 foreach ($articles as $article) {
                     $articleCategories[$article][] = $categoryID;
                 }
             }
-            $pb->advance();
+            $progressBar->advance();
         }
-        $pb->finish();
-        $output->writeln('');
+        $progressBar->finish();
 
         return $articleCategories;
     }
 
     /**
-     * @param int  $streamID
+     * @param int $streamID
      * @param bool $noCategoryCondition
      *
      * @return int[]
@@ -327,7 +441,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         $conditions = $this->repository->unserialize($conditions);
 
         $hasNoCategoryCondition = true;
-        /* @var $condition \Shopware\Bundle\SearchBundle\ConditionInterface */
+        /* @var $condition ConditionInterface */
         foreach ($conditions as $condition) {
             if ($condition instanceof NoCategoryLiveCondition) {
                 $hasNoCategoryCondition = false;
@@ -363,10 +477,10 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
 
         return array_map(function ($entry) {
             return $entry['__product_id'];
-        }, $productQuery->execute()->fetchAll(\PDO::FETCH_ASSOC));
+        }, $productQuery->execute()->fetchAll(PDO::FETCH_ASSOC));
     }
 
-    private function updateArticle(int $article, array $categories)
+    private function writeArticleCategory(int $article, array $categories)
     {
         foreach ($categories as $category) {
             $qb = $this->modelManager->getDBALQueryBuilder();
@@ -374,14 +488,32 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             try {
                 $qb = $qb->insert('s_articles_categories')
                     ->values([
-                        'articleID'  => $article,
+                        'articleID' => $article,
                         'categoryID' => $category
                     ]);
                 $qb->execute();
                 unset($qb);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 //Insert ignore
             }
+        }
+    }
+
+    private function writeArticleSeoCategory(int $article, int $category)
+    {
+        $qb = $this->modelManager->getDBALQueryBuilder();
+
+        try {
+            $qb = $qb->insert('s_articles_categories_seo')
+                ->values([
+                    'shop_id' => $this->shopContext->getShop()->getId(),
+                    'article_id' => $article,
+                    'category_id' => $category
+                ]);
+            $qb->execute();
+            unset($qb);
+        } catch (Exception $e) {
+            //Insert ignore
         }
     }
 }
