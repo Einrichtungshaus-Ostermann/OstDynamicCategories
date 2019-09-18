@@ -89,7 +89,9 @@ class Update
             case '1.2.1':
             case '1.2.2':
             case '1.3.0':
+            case '1.3.1':
                 $this->updateAttributes();
+
         }
     }
 

@@ -38,6 +38,9 @@
  * - fixed update to version 1.3.0
  * - fixed seo url for categories without priority
  *
+ * 1.3.2
+ * - fixed assigning articles to parent categories
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
