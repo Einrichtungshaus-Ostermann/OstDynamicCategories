@@ -132,7 +132,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
 
         $progressBar = new ProgressBar($output);
         $progressBar->setFormat('very_verbose');
-        $progressBar->setRedrawFrequency(200);
+        $progressBar->setRedrawFrequency(1);
         $backlog = [];
 
         $output->writeln('<info>Sorting Categories</info>');
@@ -170,7 +170,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         $output->writeln('<info>Sorting SEO Categories</info>');
         $seoCategories = $this->buildSeoCategoryAssociation();
 
-        if (count($articleCategories) !== 0) {
+        if (count($seoCategories) !== 0) {
             $output->writeln('<info>Writing Product SEO Categories</info>');
 
             $progressBar->start(count($seoCategories));
@@ -315,7 +315,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             ->addSelect('category.path AS path')
             ->addSelect('category_attribute.category_writer_seo_priority AS seoPriority')
             ->from('s_categories', 'category')
-            ->innerJoin('category', 's_categories_attributes', 'category_attribute', 'category.id = category_attribute.categoryID');
+            ->leftJoin('category', 's_categories_attributes', 'category_attribute', 'category.id = category_attribute.categoryID');
         $categoriesResult = $qb->execute()->fetchAll(PDO::FETCH_ASSOC);
 
         $categoryData = [];
@@ -327,7 +327,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             $categoryData[$row['id']] = [
                 'id' => $row['id'],
                 'path' => $this->getArrayStringAsArray($row['path']),
-                'seoPriority' => $row['seoPriority'],
+                'seoPriority' => (integer) $row['seoPriority'],
             ];
         }
         unset($categoriesResult);
@@ -348,7 +348,7 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
                     continue;
                 }
 
-                foreach ($categoryData['path'] as $categoryPath) {
+                foreach ($articleCategory['path'] as $categoryPath) {
                     $categoryPath = $categoryData[$categoryPath];
                     if ($categoryPath['seoPriority'] === null) {
                         continue;

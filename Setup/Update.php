@@ -80,7 +80,15 @@ class Update
         // switch old version
         switch ($version) {
             case '0.0.0':
-            case '1.30':
+            case '1.0.0':
+            case '1.0.1':
+            case '1.0.2':
+            case '1.0.3':
+            case '1.1.0':
+            case '1.2.0':
+            case '1.2.1':
+            case '1.2.2':
+            case '1.3.0':
                 $this->updateAttributes();
         }
     }

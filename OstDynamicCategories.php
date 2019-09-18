@@ -34,6 +34,9 @@
  * 1.3.0
  * - added seo url association
  *
+ * 1.3.1
+ * - fixed update to version 1.3.0
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
