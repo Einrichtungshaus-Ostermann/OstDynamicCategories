@@ -338,25 +338,26 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             $currentPriority = 0;
             foreach ($articleCategories as $articleCategory) {
                 $articleCategory = $categoryData[$articleCategory];
-
-                if ($articleCategory['seoPriority'] !== null) {
-                    if ($articleCategory['seoPriority'] > $currentPriority) {
-                        $seoCategory = $articleCategory;
-                        $currentPriority = $seoCategory['seoPriority'];
-                    }
+                if ($articleCategory['seoPriority'] !== null && $articleCategory['seoPriority'] > $currentPriority) {
+                    $seoCategory = $articleCategory;
+                    $currentPriority = $seoCategory['seoPriority'];
 
                     continue;
                 }
 
                 foreach ($articleCategory['path'] as $categoryPath) {
+                    if (!isset($categoryData[$categoryPath])) {
+                        continue;
+                    }
+
                     $categoryPath = $categoryData[$categoryPath];
                     if ($categoryPath['seoPriority'] === null) {
                         continue;
                     }
 
                     if ($categoryPath['seoPriority'] > $currentPriority) {
-                        $seoCategory = $categoryPath;
-                        $currentPriority = $seoCategory['seoPriority'];
+                        $seoCategory = $articleCategory;
+                        $currentPriority = $articleCategory['seoPriority'];
                     }
                 }
             }
