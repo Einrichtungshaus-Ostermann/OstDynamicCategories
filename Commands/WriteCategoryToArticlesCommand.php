@@ -280,7 +280,8 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             ->addSelect('category_attribute.category_writer_seo_priority AS seoPriority')
             ->from('s_categories', 'category')
             ->innerJoin('category', 's_categories_attributes', 'category_attribute', 'category.id = category_attribute.categoryID')
-            ->where('category_attribute.category_writer_stream_ids IS NOT NULL');
+            ->where('category_attribute.category_writer_stream_ids IS NOT NULL')
+            ->andWhere('category.id NOT IN (SELECT DISTINCT parent FROM `s_categories` WHERE parent IS NOT NULL)');
         $categoriesWithStreams = $qb->execute()->fetchAll(PDO::FETCH_ASSOC);
 
         $data = [];
