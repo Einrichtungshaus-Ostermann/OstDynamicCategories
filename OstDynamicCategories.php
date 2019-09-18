@@ -36,6 +36,7 @@
  *
  * 1.3.1
  * - fixed update to version 1.3.0
+ * - fixed seo url for categories without priority
  *
  * @package   OstDynamicCategories
  *
