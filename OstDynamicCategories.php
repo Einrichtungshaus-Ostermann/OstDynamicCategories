@@ -41,6 +41,12 @@
  * 1.3.2
  * - fixed assigning articles to parent categories
  *
+ * 1.4.0
+ * - refactored building seo-category association
+ * - changed --skipRebuild option to --skip-rebuild
+ * - added --sql-rebuild option
+ * - added --debug option
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
