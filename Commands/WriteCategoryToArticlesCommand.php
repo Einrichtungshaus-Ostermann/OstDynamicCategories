@@ -85,6 +85,13 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
     private $shopContext;
 
     /**
+     * ...
+     *
+     * @var boolean
+     */
+    private $dryRun;
+
+    /**
      * @param ModelManager                 $modelManager
      * @param RepositoryInterface          $repository
      * @param ContextServiceInterface      $contextService
@@ -122,7 +129,8 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
             ->setDescription('Write the article-categories.')
             ->addOption('skip-rebuild', null, InputOption::VALUE_NONE, "Skip rebuilding the category-ro tree.")
             ->addOption('sql-rebuild', null, InputOption::VALUE_NONE, "Use custom plain sql query to rebuild the category-ro tree? Otherwise we copy the default shopware command to rebuild the tree.")
-            ->addOption('debug', null, InputOption::VALUE_NONE, "In debug-mode we will only read 10 random categories.");
+            ->addOption('debug', null, InputOption::VALUE_NONE, "In debug-mode we will only read 10 random categories.")
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, "Don't make any changes");
     }
 
     /**
@@ -130,6 +138,9 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // set parameters
+        $this->dryRun = ($input->getOption('dry-run') === true);
+
         // get the shop context - may be given through command option
         $this->shopContext = $this->getShopContext();
 
@@ -143,7 +154,12 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         // clear s_article_categories
         try {
             $output->writeln('truncating s_articles_categories...');
-            $this->modelManager->getConnection()->exec('TRUNCATE s_articles_categories');
+
+            // not a dry run
+            if ($this->dryRun === false) {
+                // truncate
+                $this->modelManager->getConnection()->exec('TRUNCATE s_articles_categories');
+            }
         } catch (DBALException $e) {
             $output->writeln('error truncating s_articles_categories');
             return;
@@ -152,7 +168,12 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         // clear s_articles_categories_ro
         try {
             $output->writeln('truncating s_articles_categories_ro...');
-            $this->modelManager->getConnection()->exec('TRUNCATE s_articles_categories_ro');
+
+            // not a dry run
+            if ($this->dryRun === false) {
+                // truncate
+                $this->modelManager->getConnection()->exec('TRUNCATE s_articles_categories_ro');
+            }
         } catch (DBALException $e) {
             $output->writeln('error truncating s_articles_categories_ro');
             return;
@@ -161,7 +182,12 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         // clear s_articles_categories_seo
         try {
             $output->writeln('truncating s_articles_categories_seo...');
-            $this->modelManager->getConnection()->exec('TRUNCATE s_articles_categories_seo');
+
+            // not a dry run
+            if ($this->dryRun === false) {
+                // truncate
+                $this->modelManager->getConnection()->exec('TRUNCATE s_articles_categories_seo');
+            }
         } catch (DBALException $e) {
             $output->writeln('error truncating s_articles_categories_seo');
             return;
@@ -234,7 +260,12 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
         if ($this->container->getParameter('shopware.es.enabled')) {
             // write the backlog
             $output->writeln('writing elastic search backlog...');
-            $this->container->get('shopware_elastic_search.backlog_processor')->add($backlog);
+
+            // not a dry run?
+            if ($this->dryRun === false) {
+                // write it
+                $this->container->get('shopware_elastic_search.backlog_processor')->add($backlog);
+            }
         }
 
         // do we want to skip rebuilding the tree?
@@ -373,6 +404,12 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
      */
     private function rebuildCategoryTreeSql(OutputInterface $output)
     {
+        // dry run?
+        if ($this->dryRun === true) {
+            // dont do anything
+            return;
+        }
+
         // the query to rebuild
         $query = '
             CREATE TEMPORARY TABLE cat_pathIds
@@ -424,6 +461,12 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
      */
     private function rebuildCategoryTreeSwCommand(OutputInterface $output)
     {
+        // dry run?
+        if ($this->dryRun === true) {
+            // dont do anything
+            return;
+        }
+
         // get the default rebuild command
         $command = $this->getApplication()->find('sw:rebuild:category:tree');
 
@@ -710,6 +753,12 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
      */
     private function writeArticleCategory(int $article, array $categories)
     {
+        // dry run?
+        if ($this->dryRun === true) {
+            // dont do anything
+            return;
+        }
+
         // loop every category
         foreach ($categories as $category) {
             try {
@@ -737,6 +786,13 @@ class WriteCategoryToArticlesCommand extends ShopwareCommand
      */
     private function writeArticleSeoCategory(int $article, int $category)
     {
+        // dry run?
+        if ($this->dryRun === true) {
+            // dont do anything
+            return;
+        }
+
+        // try insert
         try {
             // try to insert
             $builder = $this->modelManager->getDBALQueryBuilder()

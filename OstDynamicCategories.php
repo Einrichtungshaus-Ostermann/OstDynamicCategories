@@ -47,6 +47,9 @@
  * - added --sql-rebuild option
  * - added --debug option
  *
+ * 1.4.1
+ * - added --dry-run option
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
