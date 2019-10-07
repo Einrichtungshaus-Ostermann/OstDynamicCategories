@@ -77,6 +77,9 @@ class Update
      */
     public function update($version)
     {
+        // always update attributes
+        $this->updateAttributes();
+
         // switch old version
         switch ($version) {
             case '0.0.0':
@@ -89,8 +92,9 @@ class Update
             case '1.2.1':
             case '1.2.2':
             case '1.3.0':
-                $this->updateAttributes();
             case '1.3.1':
+            case '1.3.2':
+            case '1.4.0':
         }
     }
 

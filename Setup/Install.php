@@ -40,7 +40,7 @@ class Install
                 'column' => 'category_writer_stream_ids',
                 'type'   => 'multi_selection',
                 'data'   =>                 [
-                    'label'            => 'Product Streams',
+                    'label'            => 'Dynamische Kategorien - Product Streams',
                     'helpText'         => 'Die Kategorie enthält alle Artikel der ausgewählten Product Streams. Bitte beachten Sie, dass die Verknüpfungen von Artikeln zu Kategorien via console command aktualisiert werden müssen.',
                     'translatable'     => false,
                     'position'         => 500,
@@ -53,7 +53,7 @@ class Install
                 'column' => 'category_writer_seo_priority',
                 'type'   => 'integer',
                 'data'   => [
-                    'label'            => 'SEO Priorität',
+                    'label'            => 'Dynamische Kategorien - SEO Priorität',
                     'helpText'         => 'Die Priorität dieser Kategorie bei der Erstellung der SEO Urls. Je höher die Priorität ist, desto wichtiger ist diese.',
                     'translatable'     => false,
                     'displayInBackend' => true,

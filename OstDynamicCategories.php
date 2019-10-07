@@ -50,6 +50,9 @@
  * 1.4.1
  * - added --dry-run option
  *
+ * 1.4.2
+ * - fixed name of attributes
+ *
  * @package   OstDynamicCategories
  *
  * @author    Tim Windelschmidt <tim.windelschmidt@ostermann.de>
